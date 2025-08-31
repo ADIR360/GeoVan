@@ -232,7 +232,7 @@ wss.on('connection', (ws) => {
 });
 
 // Start server
-const PORT = 8081;
+const PORT = 8080;
 server.listen(PORT, () => {
   console.log(`🚗 Vehicle WebSocket Server running on ws://localhost:${PORT}`);
   console.log(`📊 Broadcasting real-time vehicle data to ${wss.clients.size} clients`);
