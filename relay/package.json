@@ -1,0 +1,21 @@
+{
+  "name": "geovan-relay",
+  "version": "1.0.0",
+  "description": "WebSocket relay for GeoVAN MQTT to WebSocket conversion",
+  "main": "relay.js",
+  "scripts": {
+    "start": "node relay.js",
+    "dev": "nodemon relay.js"
+  },
+  "dependencies": {
+    "mqtt": "^5.3.5",
+    "ws": "^8.14.2",
+    "protobufjs": "^7.2.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["vanet", "mqtt", "websocket", "iot", "vehicle"],
+  "author": "GeoVAN Team",
+  "license": "MIT"
+}

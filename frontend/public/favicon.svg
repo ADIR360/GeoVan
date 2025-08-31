@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196f3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976d2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f50057;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c51162;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="url(#grad1)" stroke="url(#grad2)" stroke-width="2"/>
+  
+  <!-- Vehicle icon -->
+  <rect x="8" y="18" width="16" height="6" rx="2" fill="white" opacity="0.9"/>
+  <rect x="10" y="20" width="3" height="2" fill="url(#grad2)" opacity="0.8"/>
+  <rect x="19" y="20" width="3" height="2" fill="url(#grad2)" opacity="0.8"/>
+  
+  <!-- Network nodes -->
+  <circle cx="8" cy="8" r="2" fill="url(#grad2)" opacity="0.8"/>
+  <circle cx="24" cy="8" r="2" fill="url(#grad2)" opacity="0.8"/>
+  <circle cx="16" cy="6" r="2" fill="url(#grad2)" opacity="0.8"/>
+  
+  <!-- Connection lines -->
+  <line x1="8" y1="8" x2="16" y2="6" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="16" y1="6" x2="24" y2="8" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="8" y1="8" x2="24" y2="8" stroke="white" stroke-width="1" opacity="0.5"/>
+  
+  <!-- Security shield -->
+  <path d="M16 2 L20 4 L20 8 L16 10 L12 8 L12 4 Z" fill="url(#grad2)" opacity="0.9"/>
+  <path d="M16 4 L18 5.5 L18 7.5 L16 9 L14 7.5 L14 5.5 Z" fill="white" opacity="0.8"/>
+</svg>

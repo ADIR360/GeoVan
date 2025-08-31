@@ -1,0 +1,422 @@
+syntax = "proto3";
+package geovan.v2;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+// Enhanced vehicle position with comprehensive security and metadata
+message VehiclePosition {
+  // Core identification fields
+  string vehicle_id = 1;           // Ephemeral pseudonym (rotates every 5 minutes)
+  string certificate_id = 2;       // X.509 certificate identifier for PKI validation
+  string rsu_id = 3;              // Roadside Unit identifier that received the message
+  
+  // Enhanced 3D positioning with accuracy metrics
+  Vec3 position = 4;              // WGS84 coordinates + altitude + accuracy
+  Velocity3D velocity = 5;        // 3D velocity vector (m/s)
+  float heading = 6;              // Heading in degrees from true north
+  float speed_accuracy = 7;       // Speed measurement accuracy (m/s)
+  
+  // Temporal and sequence information
+  google.protobuf.Timestamp timestamp = 8;  // Precise timestamp
+  uint64 sequence = 9;            // Monotonic sequence number for replay protection
+  uint64 epoch = 10;              // Epoch number for pseudonym rotation
+  
+  // Cryptographic security fields
+  bytes signature = 11;           // ECDSA P-256 signature over message hash
+  bytes encrypted_data = 12;      // AES-256-GCM encrypted sensitive payload
+  string nonce = 13;              // Cryptographic nonce for encryption
+  bytes certificate_chain = 14;   // X.509 certificate chain for validation
+  
+  // Vehicle metadata and capabilities
+  VehicleMetadata metadata = 15;
+  repeated SensorReading sensors = 16;
+  repeated Capability capabilities = 17;
+  
+  // Trust and security metrics
+  TrustMetrics trust = 18;
+  SecurityFlags security = 19;
+  
+  // Network and routing information
+  NetworkInfo network = 20;
+  repeated string route_waypoints = 21;
+  
+  // Emergency and priority flags
+  bool emergency_vehicle = 22;
+  EmergencyType emergency_type = 23;
+  uint32 priority_level = 24;
+}
+
+// Enhanced 3D position with comprehensive accuracy metrics
+message Vec3 {
+  double lat = 1;                 // Latitude in WGS84 (degrees)
+  double lon = 2;                 // Longitude in WGS84 (degrees)
+  double alt = 3;                 // Altitude above sea level (meters)
+  float accuracy_horizontal = 4;  // Horizontal accuracy (meters, 95% confidence)
+  float accuracy_vertical = 5;    // Vertical accuracy (meters, 95% confidence)
+  float hdop = 6;                 // Horizontal dilution of precision
+  float vdop = 7;                 // Vertical dilution of precision
+  float tdop = 8;                 // Time dilution of precision
+  uint32 satellites_used = 9;     // Number of satellites used for positioning
+  uint32 satellites_visible = 10; // Total satellites visible
+}
+
+// 3D velocity vector with accuracy
+message Velocity3D {
+  float vx = 1;                   // Velocity in X direction (m/s)
+  float vy = 2;                   // Velocity in Y direction (m/s)
+  float vz = 3;                   // Velocity in Z direction (m/s)
+  float speed = 4;                // Total speed magnitude (m/s)
+  float speed_accuracy = 5;       // Speed measurement accuracy (m/s)
+  float acceleration = 6;         // Acceleration magnitude (m/s²)
+  float deceleration = 7;         // Deceleration magnitude (m/s²)
+}
+
+// Comprehensive vehicle metadata
+message VehicleMetadata {
+  string make = 1;                // Vehicle manufacturer
+  string model = 2;               // Vehicle model
+  string year = 3;                // Manufacturing year
+  string vin = 4;                 // Vehicle Identification Number (encrypted)
+  VehicleType type = 5;           // Vehicle classification
+  VehicleSize size = 6;           // Vehicle size category
+  repeated string features = 7;   // Vehicle features (ABS, ESC, etc.)
+  repeated string certifications = 8; // Safety and compliance certifications
+  
+  // Environmental information
+  FuelType fuel_type = 9;
+  float fuel_efficiency = 10;     // Fuel efficiency (L/100km or mpg)
+  EuroEmissionStandard emission_standard = 11;
+  
+  // Safety features
+  repeated SafetyFeature safety_features = 12;
+  uint32 airbag_count = 13;
+  bool autonomous_capable = 14;
+  AutonomousLevel autonomous_level = 15;
+}
+
+// Vehicle type classification
+enum VehicleType {
+  UNKNOWN = 0;
+  PASSENGER_CAR = 1;
+  TRUCK = 2;
+  BUS = 3;
+  MOTORCYCLE = 4;
+  EMERGENCY_VEHICLE = 5;
+  PUBLIC_TRANSPORT = 6;
+  DELIVERY_VAN = 7;
+  TAXI = 8;
+  RIDE_SHARE = 9;
+  GOVERNMENT = 10;
+  MILITARY = 11;
+  CONSTRUCTION = 12;
+  AGRICULTURAL = 13;
+  RECREATIONAL = 14;
+}
+
+// Vehicle size categories
+enum VehicleSize {
+  MICRO = 0;      // Smart car, small motorcycle
+  SMALL = 1;      // Compact car, large motorcycle
+  MEDIUM = 2;     // Sedan, small SUV
+  LARGE = 3;      // Large SUV, pickup truck
+  EXTRA_LARGE = 4; // Bus, large truck
+  OVERSIZED = 5;  // Oversized load, special transport
+}
+
+// Fuel type enumeration
+enum FuelType {
+  GASOLINE = 0;
+  DIESEL = 1;
+  ELECTRIC = 2;
+  HYBRID = 3;
+  PLUGIN_HYBRID = 4;
+  HYDROGEN = 5;
+  NATURAL_GAS = 6;
+  BIOFUEL = 7;
+}
+
+// Euro emission standards
+enum EuroEmissionStandard {
+  EURO_1 = 0;
+  EURO_2 = 1;
+  EURO_3 = 2;
+  EURO_4 = 3;
+  EURO_5 = 4;
+  EURO_6 = 5;
+  EURO_7 = 6;
+  ZERO_EMISSION = 7;
+}
+
+// Safety features
+enum SafetyFeature {
+  ABS = 0;                    // Anti-lock Braking System
+  ESC = 1;                    // Electronic Stability Control
+  TCS = 2;                    // Traction Control System
+  BLIS = 3;                   // Blind Spot Information System
+  LDW = 4;                    // Lane Departure Warning
+  FCW = 5;                    // Forward Collision Warning
+  AEB = 6;                    // Autonomous Emergency Braking
+  BSM = 7;                    // Blind Spot Monitoring
+  RCTA = 8;                   // Rear Cross Traffic Alert
+  PARKING_SENSORS = 9;        // Parking sensors
+  BACKUP_CAMERA = 10;         // Backup camera
+  SURROUND_VIEW = 11;         // 360-degree camera system
+}
+
+// Autonomous driving levels
+enum AutonomousLevel {
+  LEVEL_0 = 0;                // No automation
+  LEVEL_1 = 1;                // Driver assistance
+  LEVEL_2 = 2;                // Partial automation
+  LEVEL_3 = 3;                // Conditional automation
+  LEVEL_4 = 4;                // High automation
+  LEVEL_5 = 5;                // Full automation
+}
+
+// Comprehensive sensor readings
+message SensorReading {
+  SensorType type = 1;         // Sensor type
+  float value = 2;             // Sensor value
+  float accuracy = 3;          // Measurement accuracy
+  google.protobuf.Timestamp timestamp = 4; // When reading was taken
+  string unit = 5;             // Unit of measurement
+  float min_value = 6;         // Minimum expected value
+  float max_value = 7;         // Maximum expected value
+  bool is_calibrated = 8;      // Whether sensor is calibrated
+  uint32 calibration_date = 9; // Last calibration date (Unix timestamp)
+}
+
+// Sensor types
+enum SensorType {
+  GPS = 0;                     // Global Positioning System
+  ACCELEROMETER = 1;           // 3-axis accelerometer
+  GYROSCOPE = 2;               // 3-axis gyroscope
+  MAGNETOMETER = 3;            // 3-axis magnetometer
+  TEMPERATURE = 4;             // Temperature sensor
+  HUMIDITY = 5;                // Humidity sensor
+  PRESSURE = 6;                // Barometric pressure
+  FUEL_LEVEL = 7;              // Fuel level sensor
+  ENGINE_RPM = 8;              // Engine revolutions per minute
+  ENGINE_TEMP = 9;             // Engine temperature
+  OIL_PRESSURE = 10;           // Oil pressure
+  TIRE_PRESSURE = 11;          // Tire pressure monitoring
+  BRAKE_PRESSURE = 12;         // Brake system pressure
+  STEERING_ANGLE = 13;         // Steering wheel angle
+  WHEEL_SPEED = 14;            // Individual wheel speed
+  BATTERY_VOLTAGE = 15;        // Battery voltage
+  BATTERY_TEMP = 16;           // Battery temperature
+  CHARGING_STATUS = 17;        // Electric vehicle charging status
+  RANGE_ESTIMATE = 18;         // Estimated remaining range
+}
+
+// Vehicle capabilities
+message Capability {
+  string name = 1;              // Capability name
+  string version = 2;           // Capability version
+  bool enabled = 3;             // Whether capability is enabled
+  repeated string parameters = 4; // Capability parameters
+  uint32 last_update = 5;       // Last capability update
+}
+
+// Trust metrics with detailed scoring
+message TrustMetrics {
+  float overall_score = 1;      // Overall trust score (0.0 - 1.0)
+  float behavior_score = 2;     // Behavioral trust based on movement patterns
+  float certificate_score = 3;  // Certificate validity and chain trust
+  float history_score = 4;      // Historical trust based on past behavior
+  float proximity_score = 5;    // Trust based on proximity to other trusted vehicles
+  float sensor_score = 6;       // Trust based on sensor data consistency
+  
+  // Detailed trust breakdown
+  repeated TrustFactor factors = 7;
+  repeated string flags = 8;    // Trust flags and warnings
+  uint64 last_update = 9;       // Last trust computation
+  uint64 next_update = 10;      // Next scheduled trust update
+  
+  // Anomaly detection
+  float anomaly_score = 11;     // Anomaly detection score (0.0 = normal, 1.0 = highly anomalous)
+  repeated AnomalyType anomalies = 12; // Detected anomalies
+  uint32 anomaly_count = 13;    // Total anomaly count in last 24 hours
+}
+
+// Trust factors contributing to overall score
+message TrustFactor {
+  string name = 1;              // Factor name
+  float weight = 2;             // Weight in overall calculation
+  float score = 3;              // Individual factor score
+  string description = 4;       // Factor description
+  uint64 last_calculation = 5;  // Last calculation timestamp
+}
+
+// Anomaly types
+enum AnomalyType {
+  NONE = 0;                     // No anomalies detected
+  SPEED_VIOLATION = 1;          // Speed exceeds limits
+  RAPID_ACCELERATION = 2;       // Unusual acceleration
+  RAPID_DECELERATION = 3;       // Unusual deceleration
+  ERRATIC_MOVEMENT = 4;         // Erratic driving pattern
+  POSITION_JUMP = 5;            // Unrealistic position change
+  SENSOR_INCONSISTENCY = 6;     // Sensor data inconsistency
+  CERTIFICATE_EXPIRED = 7;      // Expired certificate
+  SIGNATURE_INVALID = 8;        // Invalid cryptographic signature
+  REPLAY_ATTEMPT = 9;           // Potential replay attack
+  FREQUENCY_VIOLATION = 10;     // Message frequency violation
+  LOCATION_ANOMALY = 11;        // Location-based anomaly
+  BEHAVIOR_CHANGE = 12;         // Sudden behavior change
+}
+
+// Security flags and status
+message SecurityFlags {
+  bool certificate_valid = 1;   // Certificate is valid and not expired
+  bool signature_valid = 2;     // Cryptographic signature is valid
+  bool not_replay = 3;          // Message is not a replay
+  bool rate_limit_ok = 4;       // Message rate is within limits
+  bool location_plausible = 5;  // Location is geographically plausible
+  bool timestamp_fresh = 6;     // Timestamp is recent and valid
+  bool pseudonym_valid = 7;     // Pseudonym is valid for current epoch
+  
+  // Security warnings
+  repeated SecurityWarning warnings = 8;
+  uint32 threat_level = 9;      // Overall threat level (0-10)
+  string threat_description = 10; // Description of current threats
+}
+
+// Security warnings
+enum SecurityWarning {
+  NO_WARNINGS = 0;              // No security warnings
+  CERTIFICATE_EXPIRING = 1;     // Certificate expiring soon
+  HIGH_MESSAGE_RATE = 2;        // Unusually high message rate
+  SUSPICIOUS_LOCATION = 3;      // Suspicious location pattern
+  BEHAVIOR_ANOMALY = 4;         // Behavioral anomaly detected
+  NETWORK_ANOMALY = 5;          // Network traffic anomaly
+  AUTHENTICATION_FAILURE = 6;   // Authentication failure
+  AUTHORIZATION_VIOLATION = 7;  // Authorization violation
+  DATA_INTEGRITY_ISSUE = 8;     // Data integrity issue
+  PRIVACY_VIOLATION = 9;        // Privacy violation detected
+}
+
+// Network information
+message NetworkInfo {
+  string network_type = 1;      // Network type (DSRC, 4G, 5G, WiFi)
+  string network_id = 2;        // Network identifier
+  float signal_strength = 3;    // Signal strength (dBm)
+  float latency = 4;            // Network latency (ms)
+  float bandwidth = 5;          // Available bandwidth (Mbps)
+  bool encrypted = 6;           // Whether connection is encrypted
+  string encryption_type = 7;   // Type of encryption used
+  uint32 retry_count = 8;       // Number of retry attempts
+  uint64 last_network_change = 9; // Last network change timestamp
+}
+
+// Emergency vehicle types
+enum EmergencyType {
+  NOT_EMERGENCY = 0;            // Not an emergency vehicle
+  POLICE = 1;                   // Police vehicle
+  FIRE = 2;                     // Fire truck
+  AMBULANCE = 3;                // Ambulance
+  RESCUE = 4;                   // Rescue vehicle
+  MILITARY = 5;                 // Military vehicle
+  GOVERNMENT = 6;               // Government emergency vehicle
+  CIVIL_DEFENSE = 7;            // Civil defense vehicle
+}
+
+// Vehicle cluster for traffic analysis
+message VehicleCluster {
+  Vec3 center = 1;              // Cluster center position
+  uint32 count = 2;             // Number of vehicles in cluster
+  float avg_speed = 3;          // Average speed of cluster
+  float density = 4;            // Vehicle density (vehicles/km²)
+  repeated string vehicle_ids = 5; // IDs of vehicles in cluster
+  ClusterType type = 6;         // Type of cluster
+  float radius = 7;             // Cluster radius (meters)
+  uint64 formation_time = 8;    // When cluster formed
+  uint64 last_update = 9;       // Last cluster update
+}
+
+// Cluster types
+enum ClusterType {
+  TRAFFIC_JAM = 0;              // Traffic jam cluster
+  CONVOY = 1;                   // Vehicle convoy
+  PARKING = 2;                  // Parking cluster
+  INTERSECTION = 3;             // Intersection waiting
+  TOLL_BOOTH = 4;               // Toll booth queue
+  ACCIDENT_SCENE = 5;           // Accident scene
+  CONSTRUCTION = 6;             // Construction zone
+  SPECIAL_EVENT = 7;            // Special event traffic
+}
+
+// Trust score update
+message TrustScore {
+  string vehicle_id = 1;        // Vehicle identifier
+  float score = 2;              // Trust score (0.0 - 1.0)
+  string reason = 3;            // Reason for score change
+  google.protobuf.Timestamp timestamp = 4; // When score was computed
+  repeated string factors = 5;  // Factors contributing to score
+  float previous_score = 6;     // Previous trust score
+  float change = 7;             // Score change from previous
+}
+
+// System status message
+message SystemStatus {
+  string service_id = 1;        // Service identifier
+  ServiceStatus status = 2;     // Current service status
+  string version = 3;           // Service version
+  uint64 uptime = 4;            // Service uptime in seconds
+  float cpu_usage = 5;          // CPU usage percentage
+  float memory_usage = 6;       // Memory usage percentage
+  float disk_usage = 7;         // Disk usage percentage
+  repeated string active_connections = 8; // Active connection types
+  repeated string errors = 9;   // Recent errors
+  google.protobuf.Timestamp timestamp = 10; // Status timestamp
+}
+
+// Service status enumeration
+enum ServiceStatus {
+  UNKNOWN = 0;                  // Status unknown
+  STARTING = 1;                 // Service starting
+  RUNNING = 2;                  // Service running normally
+  DEGRADED = 3;                 // Service degraded
+  STOPPING = 4;                 // Service stopping
+  STOPPED = 5;                  // Service stopped
+  ERROR = 6;                    // Service in error state
+  MAINTENANCE = 7;              // Service in maintenance mode
+}
+
+// Alert message for security and system events
+message Alert {
+  string alert_id = 1;          // Unique alert identifier
+  AlertType type = 2;           // Type of alert
+  AlertSeverity severity = 3;   // Alert severity level
+  string title = 4;             // Alert title
+  string description = 5;       // Alert description
+  string vehicle_id = 6;        // Related vehicle (if applicable)
+  Vec3 location = 7;            // Alert location
+  google.protobuf.Timestamp timestamp = 8; // When alert was generated
+  repeated string tags = 9;     // Alert tags for categorization
+  bool acknowledged = 10;        // Whether alert has been acknowledged
+  string acknowledged_by = 11;  // Who acknowledged the alert
+  uint64 acknowledged_at = 12;  // When alert was acknowledged
+}
+
+// Alert types
+enum AlertType {
+  SECURITY = 0;                 // Security-related alert
+  TRAFFIC = 1;                  // Traffic-related alert
+  SYSTEM = 2;                   // System-related alert
+  MAINTENANCE = 3;              // Maintenance-related alert
+  EMERGENCY = 4;                // Emergency alert
+  WEATHER = 5;                  // Weather-related alert
+  INFRASTRUCTURE = 6;           // Infrastructure-related alert
+  COMPLIANCE = 7;               // Compliance-related alert
+}
+
+// Alert severity levels
+enum AlertSeverity {
+  INFO = 0;                     // Informational alert
+  LOW = 1;                      // Low priority alert
+  MEDIUM = 2;                   // Medium priority alert
+  HIGH = 3;                     // High priority alert
+  CRITICAL = 4;                 // Critical alert
+  EMERGENCY = 5;                // Emergency alert
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoVAN - Real-time Vehicle Tracking</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-car"></i> GeoVAN</h1>
+            <div class="status">
+                <span id="connection-status" class="status-indicator offline">Offline</span>
+                <span id="vehicle-count">0 vehicles</span>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Map container -->
+            <div id="map" class="map-container"></div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-cog"></i> Controls</h3>
+                    <div class="control-group">
+                        <label for="trail-length">Trail Length:</label>
+                        <input type="range" id="trail-length" min="5" max="100" value="20">
+                        <span id="trail-length-value">20</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="update-interval">Update Interval:</label>
+                        <select id="update-interval">
+                            <option value="100">100ms</option>
+                            <option value="500">500ms</option>
+                            <option value="1000" selected>1s</option>
+                            <option value="2000">2s</option>
+                        </select>
+                    </div>
+                    <button id="clear-trails" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Clear Trails
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-car"></i> Vehicles</h3>
+                    <div id="vehicle-list" class="vehicle-list">
+                        <div class="no-vehicles">No vehicles connected</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-info-circle"></i> Info</h3>
+                    <div class="info-item">
+                        <strong>WebSocket:</strong> <span id="ws-status">Disconnected</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Last Update:</strong> <span id="last-update">Never</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Messages/sec:</strong> <span id="msg-rate">0</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vehicle detail modal -->
+    <div id="vehicle-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Vehicle Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modal-content">
+                    <!-- Vehicle details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

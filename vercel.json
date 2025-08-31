@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "name": "geovan-vehicle-system",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "frontend/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "env": {
+    "REACT_APP_IOT_SERVER_URL": "https://your-iot-server.vercel.app"
+  },
+  "functions": {
+    "api/vehicle/update.js": {
+      "maxDuration": 30
+    },
+    "api/vehicles.js": {
+      "maxDuration": 30
+    },
+    "api/analytics.js": {
+      "maxDuration": 30
+    }
+  }
+}

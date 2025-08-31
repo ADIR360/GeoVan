@@ -1,0 +1,154 @@
+[package]
+name = "geovan"
+version = "0.1.0"
+edition = "2021"
+authors = ["GeoVAN Team <team@geovan.dev>"]
+description = "Enterprise-grade VANET Security & Visualization Platform"
+license = "MIT"
+repository = "https://github.com/your-org/geovan"
+keywords = ["vanet", "security", "vehicles", "iot", "blockchain", "cryptography"]
+categories = ["network-programming", "security", "web-programming", "asynchronous"]
+
+[dependencies]
+# Web framework and HTTP
+actix-web = "4.4"
+actix-rt = "2.9"
+actix-cors = "0.6"
+actix-http = "3.6"
+
+# Serialization and deserialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+prost = "0.12"
+prost-types = "0.12"
+tokio-util = { version = "0.7", features = ["codec"] }
+
+# Database and caching
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid", "json"] }
+redis = { version = "0.23", features = ["tokio-comp", "connection-manager"] }
+tokio = { version = "1.35", features = ["full"] }
+
+# Message queuing
+lapin = "2.3"
+amq-protocol = "2.4"
+
+# Cryptography and security
+ring = "0.17"
+ed25519-dalek = "2.0"
+x509-parser = "0.15"
+rustls = "0.21"
+rustls-pemfile = "1.0"
+jsonwebtoken = "9.2"
+argon2 = "0.5"
+rand = "0.8"
+getrandom = "0.2"
+
+# Time and utilities
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+thiserror = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+log = "0.4"
+env_logger = "0.10"
+
+# Configuration
+config = "0.14"
+toml = "0.8"
+dotenv = "0.15"
+
+# Async utilities
+futures = "0.3"
+async-trait = "0.1"
+tokio-stream = "0.1"
+
+# WebSocket support
+actix-web-actors = "4.2"
+actix = "0.13"
+
+# Metrics and monitoring
+prometheus = "0.13"
+actix-web-prom = "0.6"
+
+# Validation
+validator = { version = "0.16", features = ["derive"] }
+
+# Compression
+flate2 = "1.0"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+
+# Geographic calculations
+geo = "0.27"
+geojson = "0.28"
+
+# Machine learning and analytics
+ndarray = "0.15"
+statrs = "0.16"
+
+# Rate limiting
+governor = "0.6"
+
+# Feature flags
+feature-flags = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockall = "0.12"
+testcontainers = "0.15"
+wiremock = "0.5"
+criterion = "0.5"
+
+[features]
+default = ["postgres", "redis", "rabbitmq", "security", "monitoring"]
+postgres = ["sqlx/postgres"]
+redis = ["redis"]
+rabbitmq = ["lapin"]
+security = ["ring", "ed25519-dalek", "x509-parser", "rustls"]
+monitoring = ["prometheus", "actix-web-prom"]
+full = ["postgres", "redis", "rabbitmq", "security", "monitoring", "compression", "analytics"]
+compression = ["flate2"]
+analytics = ["ndarray", "statrs"]
+
+[[bin]]
+name = "geovan-api"
+path = "src/bin/api.rs"
+
+[[bin]]
+name = "geovan-tracker"
+path = "src/bin/tracker.rs"
+
+[[bin]]
+name = "geovan-trust"
+path = "src/bin/trust.rs"
+
+[[bin]]
+name = "geovan-analytics"
+path = "src/bin/analytics.rs"
+
+[[bin]]
+name = "geovan-migrate"
+path = "src/bin/migrate.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[workspace]
+members = [
+    "crates/geovan-core",
+    "crates/geovan-security",
+    "crates/geovan-database",
+    "crates/geovan-messaging",
+    "crates/geovan-analytics",
+    "crates/geovan-frontend"
+]
