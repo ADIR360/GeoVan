@@ -22,16 +22,5 @@
   ],
   "env": {
     "REACT_APP_IOT_SERVER_URL": "https://your-iot-server.vercel.app"
-  },
-  "functions": {
-    "api/vehicle/update.js": {
-      "maxDuration": 30
-    },
-    "api/vehicles.js": {
-      "maxDuration": 30
-    },
-    "api/analytics.js": {
-      "maxDuration": 30
-    }
   }
 }
